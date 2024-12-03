@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class WelcomeScreen extends StatelessWidget {
-  const WelcomeScreen({Key? key}) : super(key: key);
+  const WelcomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -11,22 +11,20 @@ class WelcomeScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Welcome to Movie Night!'),
-            SizedBox(height: 20),
+            const Text('Welcome to Movie Night!'),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                // Navigate to Share Code Screen
                 Navigator.pushNamed(context, '/share-code');
               },
-              child: Text('Get a Code to Share'),
+              child: const Text('Get a Code to Share'),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                // Navigate to Enter Code Screen
                 Navigator.pushNamed(context, '/enter-code');
               },
-              child: Text('Enter a Code'),
+              child: const Text('Enter a Code'),
             ),
           ],
         ),

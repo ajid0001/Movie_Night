@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'screens/welcome_screen.dart';
 import 'screens/share_code_screen.dart';
 import 'screens/enter_code_screen.dart';
+import 'screens/movie_selection_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,6 +29,7 @@ class MainApp extends StatelessWidget {
         '/': (context) => const WelcomeScreen(),
         '/share-code': (context) => const ShareCodeScreen(),
         '/enter-code': (context) => const EnterCodeScreen(),
+        '/movie-selection': (context) => const MovieSelectionScreen(),
       },
     );
   }
