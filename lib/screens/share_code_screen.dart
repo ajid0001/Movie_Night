@@ -1,66 +1,6 @@
-// import 'package:flutter/material.dart';
-// import 'package:http/http.dart' as http;
-// import 'dart:convert';
-
-// class ShareCodeScreen extends StatefulWidget {
-//   const ShareCodeScreen({super.key});
-
-//   @override
-//   _ShareCodeScreenState createState() => _ShareCodeScreenState();
-// }
-
-// class _ShareCodeScreenState extends State<ShareCodeScreen> {
-//   String? code;
-//   String? errorMessage;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     _fetchCode();
-//   }
-
-//   Future<void> _fetchCode() async {
-//     try {
-//       final response = await http.get(Uri.parse(
-//           'https://api.themoviedb.org/3/movie/popular?api_key=252a4626e441c706b2114a01e4ee051c&page=1'));
-
-//       if (response.statusCode == 200) {
-//         print(response.body);
-//         var data = json.decode(response.body);
-//         setState(() {
-//           code = data['code'];
-//         });
-//       } else {
-//         setState(() {
-//           errorMessage = 'Failed to fetch code.';
-//         });
-//       }
-//     } catch (e) {
-//       setState(() {
-//         errorMessage = 'Error: $e';
-//       });
-//     }
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(title: const Text('Share Code')),
-//       body: Center(
-//         child: errorMessage != null
-//             ? Text(errorMessage!)
-//             : code != null
-//                 ? Text('Your Code: $code')
-//                 : const CircularProgressIndicator(),
-//       ),
-//     );
-//   }
-// }
-
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:device_info_plus/device_info_plus.dart';
+import '../services/session_service.dart';
 
 class ShareCodeScreen extends StatefulWidget {
   const ShareCodeScreen({super.key});
@@ -84,27 +24,16 @@ class _ShareCodeScreenState extends State<ShareCodeScreen> {
     String deviceId = await _getDeviceId();
 
     try {
-      final response = await http.get(
-        Uri.parse(
-            'https://movie-night-api.onrender.com/start-session?device_id=$deviceId'),
-      );
+      final sessionData = await SessionService().startSession(deviceId);
 
-      if (response.statusCode == 200) {
-        var data = json.decode(response.body);
-        setState(() {
-          sessionId = data['data']['session_id'];
-          code = data['data']['code'];
-          errorMessage = null;
-        });
-      } else {
-        setState(() {
-          errorMessage =
-              'Failed to generate session code. Status: ${response.statusCode}';
-        });
-      }
+      setState(() {
+        sessionId = sessionData['sessionId'];
+        code = sessionData['code'];
+        errorMessage = null;
+      });
     } catch (e) {
       setState(() {
-        errorMessage = 'Error occurred while making the request: $e';
+        errorMessage = 'Failed to generate session code. Error: $e';
       });
     }
   }
@@ -117,12 +46,10 @@ class _ShareCodeScreenState extends State<ShareCodeScreen> {
     try {
       if (Theme.of(context).platform == TargetPlatform.android) {
         AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-        deviceId =
-            androidInfo.id ?? "unknown_device_id";
+        deviceId = androidInfo.id ?? "unknown_device_id";
       } else if (Theme.of(context).platform == TargetPlatform.iOS) {
         IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-        deviceId = iosInfo.identifierForVendor ??
-            "unknown_device_id";
+        deviceId = iosInfo.identifierForVendor ?? "unknown_device_id";
       } else {
         deviceId = "unknown_device_id";
       }
