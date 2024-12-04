@@ -17,6 +17,7 @@ dependencies:
   flutter_dotenv: ^5.0.2
   android_id:
   platform_device_id: ^1.0.1
+  lottie: ^2.2.0
 
 dev_dependencies:
   flutter_test:
@@ -32,6 +33,7 @@ flutter_icons:
 
 flutter_native_splash:
   color: "#000000"
+  background_color: "#000000"
   image: assets/images/splash.jpg
   android: true
   ios: true

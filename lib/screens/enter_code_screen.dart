@@ -21,7 +21,6 @@ class EnterCodeScreen extends StatelessWidget {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                // Handle code submission
                 print('Code: ${_controller.text}');
               },
               child: const Text('Submit'),

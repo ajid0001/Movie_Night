@@ -20,8 +20,35 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       title: 'Movie Night',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        textTheme: GoogleFonts.latoTextTheme(),
+        primarySwatch: Colors.deepPurple,
+        textTheme: GoogleFonts.latoTextTheme().copyWith(
+          bodyMedium: const TextStyle(fontSize: 16, color: Colors.black),
+          bodyLarge: const TextStyle(fontSize: 18, color: Colors.grey),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.deepPurple,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            textStyle: const TextStyle(fontSize: 18),
+          ),
+        ),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.deepPurple,
+          foregroundColor: Colors.white,
+        ),
+        iconTheme: const IconThemeData(
+          color: Colors.white,
+          size: 24,
+        ),
+        scaffoldBackgroundColor: Colors.white,
+        buttonTheme: const ButtonThemeData(
+          buttonColor: Colors.deepPurple,
+          textTheme: ButtonTextTheme.primary,
+        ),
         useMaterial3: true,
       ),
       initialRoute: '/',
