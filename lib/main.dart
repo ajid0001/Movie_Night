@@ -5,9 +5,14 @@ import 'screens/welcome_screen.dart';
 import 'screens/share_code_screen.dart';
 import 'screens/enter_code_screen.dart';
 import 'screens/movie_selection_screen.dart';
+import 'package:movie_night/widgets/colors.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  await Future.delayed(const Duration(seconds: 1));
+  FlutterNativeSplash.remove();
   await dotenv.load(fileName: ".env");
   runApp(const MainApp());
 }
@@ -20,14 +25,15 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       title: 'Movie Night',
       theme: ThemeData(
-        primarySwatch: Colors.deepPurple,
+        // primarySwatch: Colors.deepPurple,
+        primaryColor: primaryColor,
         textTheme: GoogleFonts.latoTextTheme().copyWith(
           bodyMedium: const TextStyle(fontSize: 16, color: Colors.black),
           bodyLarge: const TextStyle(fontSize: 18, color: Colors.grey),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.deepPurple,
+            backgroundColor: primaryColor,
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
             shape: RoundedRectangleBorder(
@@ -37,7 +43,7 @@ class MainApp extends StatelessWidget {
           ),
         ),
         appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.deepPurple,
+          backgroundColor: primaryColor,
           foregroundColor: Colors.white,
         ),
         iconTheme: const IconThemeData(
@@ -46,7 +52,7 @@ class MainApp extends StatelessWidget {
         ),
         scaffoldBackgroundColor: Colors.white,
         buttonTheme: const ButtonThemeData(
-          buttonColor: Colors.deepPurple,
+          buttonColor: primaryColor,
           textTheme: ButtonTextTheme.primary,
         ),
         useMaterial3: true,

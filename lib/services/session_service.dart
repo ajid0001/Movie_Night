@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../models/session.dart';
+// import '../models/session.dart';
 import '../models/movie.dart';
 import '../services/movie_service.dart';
 
@@ -43,14 +43,29 @@ class SessionService {
         List<Movie> movies = await MovieService().fetchMovies();
         return movies;
       } else {
-        print("Failed to join session: ${response.statusCode}");
-        print("Response body: ${response.body}");
+        // print("Failed to join session: ${response.statusCode}");
+        // print("Response body: ${response.body}");
         throw Exception(
             'Failed to join session. Invalid code or session not found');
       }
     } catch (e) {
-      print("Error: $e");
+      // print("Error: $e");
       throw Exception('Failed to join session: $e');
+    }
+  }
+
+  // Method to vote for a movie (true for selecting, false for skipping)
+
+  Future<bool> voteMovie(String sessionId, int movieId, bool vote) async {
+    final response = await http.get(Uri.parse(
+      '$baseUrl/vote-movie?session_id=$sessionId&movie_id=$movieId&vote=$vote',
+    ));
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body)['data'];
+      return data['match'];
+    } else {
+      throw Exception('Failed to vote for the movie');
     }
   }
 }

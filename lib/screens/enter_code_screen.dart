@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import '../services/session_service.dart';
 import '../models/movie.dart';
+import 'package:movie_night/widgets/button.dart';
 
 class EnterCodeScreen extends StatefulWidget {
   const EnterCodeScreen({super.key});
@@ -31,7 +32,7 @@ class _EnterCodeScreenState extends State<EnterCodeScreen> {
       }
     } catch (e) {
       deviceId = "unknown_device_id";
-      print("Failed to get device ID: $e");
+      // print("Failed to get device ID: $e");
     }
 
     return deviceId;
@@ -70,40 +71,61 @@ class _EnterCodeScreenState extends State<EnterCodeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Enter Code')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                'Enter the session code below:',
-                style: TextStyle(fontSize: 18),
-              ),
-              const SizedBox(height: 20),
-              TextField(
-                controller: _controller,
-                decoration: const InputDecoration(
-                  labelText: 'Enter Code',
-                  border: OutlineInputBorder(),
+      body: Stack(
+        children: [
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              height: 300,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Color.fromARGB(0, 246, 239, 239),
+                    Color.fromARGB(255, 206, 116, 228),
+                  ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
                 ),
               ),
-              const SizedBox(height: 20),
-              if (errorMessage.isNotEmpty)
-                Text(
-                  errorMessage,
-                  style: const TextStyle(color: Colors.red),
-                ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: isLoading ? null : _joinSession,
-                child: isLoading
-                    ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text('Join Session'),
-              ),
-            ],
+            ),
           ),
-        ),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'Enter the code from your friend:',
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  const SizedBox(height: 20),
+                  TextField(
+                    controller: _controller,
+                    decoration: const InputDecoration(
+                      labelText: 'Enter Code',
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  if (errorMessage.isNotEmpty)
+                    Text(
+                      errorMessage,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    style: buttonPrimary,
+                    onPressed: isLoading ? null : _joinSession,
+                    child: isLoading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text('Join Session'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
