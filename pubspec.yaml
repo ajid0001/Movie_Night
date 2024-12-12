@@ -48,7 +48,6 @@ flutter:
     - assets/images/splash.jpg
     - assets/images/icon.png
     - assets/images/movie.jpg
-    - assets/images/welcome.jpg
     - assets/images/background.jpg
     - assets/images/icon.jpg
     - .env

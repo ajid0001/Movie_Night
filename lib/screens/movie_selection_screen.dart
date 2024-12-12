@@ -15,11 +15,14 @@ class _MovieSelectionScreenState extends State<MovieSelectionScreen> {
   late Future<List<Movie>> _movies;
   String errorMessage = '';
   bool isMatchFound = false;
-  String sessionId = 'your-session-id';
+  String sessionId = ''; 
 
   @override
   void initState() {
     super.initState();
+
+    _initializeSession(); 
+
     _movies = MovieService().fetchMovies().catchError((error) {
       setState(() {
         errorMessage = error.toString();
@@ -28,10 +31,51 @@ class _MovieSelectionScreenState extends State<MovieSelectionScreen> {
     });
   }
 
-  Future<void> _handleSelection(Movie movie, bool vote) async {
+  Future<void> _initializeSession() async {
     try {
-      bool isMatch =
+      if (sessionId.isEmpty) {
+        String deviceId =
+            await _getDeviceId();
+        Map<String, String> sessionData =
+            await SessionService().startSession(deviceId);
+        setState(() {
+          sessionId = sessionData['sessionId']!; 
+        });
+        print('Session IDDDD: $sessionId');
+      }
+    } catch (error) {
+      setState(() {
+        errorMessage = 'Failed to fetch session ID: $error';
+      });
+    }
+  }
+
+  Future<String> _getDeviceId() async {
+    return 'your-device-id'; 
+  }
+
+  Future<void> _handleSelection(Movie movie, bool vote) async {
+    if (sessionId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content:
+                Text('Session ID is invalid. Please start or join a session.')),
+      );
+      return;
+    }
+
+    try {
+      final isMatch =
           await SessionService().voteMovie(sessionId, movie.id, vote);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(vote
+              ? 'You liked ${movie.title}!'
+              : 'You skipped ${movie.title}.'),
+          duration: const Duration(seconds: 2),
+        ),
+      );
 
       if (isMatch && !isMatchFound) {
         setState(() {
@@ -40,7 +84,12 @@ class _MovieSelectionScreenState extends State<MovieSelectionScreen> {
         _showMatchPopup(movie);
       }
     } catch (e) {
-      // print('Error voting for movie: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${e.toString()}'),
+          duration: const Duration(seconds: 3),
+        ),
+      );
     }
   }
 
@@ -124,13 +173,10 @@ class _MovieSelectionScreenState extends State<MovieSelectionScreen> {
                     },
                     pagination: const SwiperPagination(),
                     control: const SwiperControl(),
-                    onIndexChanged: (index) {
-                      print('Movie index changed to $index');
-                    },
+                    onIndexChanged: (index) {},
                     onTap: (index) {
-                      final selectedMovie = snapshot.data![index];
-                      _handleSelection(
-                          selectedMovie, true);
+                      final movie = snapshot.data![index];
+                      _handleSelection(movie, true);
                     },
                   );
                 },
