@@ -37,12 +37,10 @@ class MovieSelectionScreenState extends State<MovieSelectionScreen> {
         setState(() {
           sessionId = sessionData.sessionId;
         });
-        print('Session ID: $sessionId');
       } else {
         setState(() {
           sessionId = storedSessionId;
         });
-        print('Retrieved Session ID: $sessionId');
       }
     } catch (error) {
       setState(() {

@@ -17,8 +17,6 @@ class SessionService {
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
         final session = Session.fromJson(data);
-        print('Session started: ${session.sessionId}');
-        print('Device ID: $deviceId');
         return session;
       } else {
         throw Exception('Failed to generate session code');
@@ -33,7 +31,6 @@ class SessionService {
     try {
       final preferences = await SharedPreferences.getInstance();
       await preferences.setString(_sessionKey, sessionId);
-      print('Session ID saved: $sessionId');
     } catch (e) {
       throw Exception('Failed to save session ID: $e');
     }
@@ -44,7 +41,6 @@ class SessionService {
     try {
       final preferences = await SharedPreferences.getInstance();
       final sessionId = preferences.getString(_sessionKey);
-      print('Retrieved Session ID: $sessionId');
       return sessionId;
     } catch (e) {
       throw Exception('Failed to get session ID: $e');
@@ -62,8 +58,6 @@ class SessionService {
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
         final session = Session.fromJson(data);
-        print('Joined session: ${session.sessionId}');
-        print('Device ID: $deviceId');
         return session;
       } else {
         throw Exception('Invalid code or session not found');
@@ -84,14 +78,8 @@ class SessionService {
     try {
       final response = await http.get(uri);
 
-      print('Response status: ${response.statusCode}');
-      print('Response body: ${response.body}');
-
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body)['data'];
-        print('Vote result: ${data['message']}');
-        print('Match: ${data['match']}');
-        print('Num devices: ${data['num_devices']}');
         return data['match'] as bool;
       } else {
         throw Exception('Failed to vote for the movie');
