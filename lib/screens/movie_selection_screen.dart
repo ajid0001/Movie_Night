@@ -173,7 +173,7 @@ class MovieSelectionScreenState extends State<MovieSelectionScreen> {
                   }
 
                   return Swiper(
-                    controller: _swiperController, // Attach controller
+                    controller: _swiperController,
                     itemCount: snapshot.data!.length,
                     itemBuilder: (context, index) {
                       final movie = snapshot.data![index];
