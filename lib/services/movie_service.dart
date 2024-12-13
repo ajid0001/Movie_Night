@@ -1,11 +1,9 @@
 import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import '../models/movie.dart';
 
 class MovieService {
   final String _apiKey = '252a4626e441c706b2114a01e4ee051c';
-  // final String _apiKey = dotenv.env['API_KEY']!;
   final String _baseUrl = 'https://api.themoviedb.org/3/movie/popular';
 
   Future<List<Movie>> fetchMovies() async {
