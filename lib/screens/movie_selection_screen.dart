@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_swiper_view/flutter_swiper_view.dart';
+import 'package:movie_night/models/session.dart';
+import 'package:platform_device_id/platform_device_id.dart';
 import '../models/movie.dart';
 import '../services/movie_service.dart';
 import '../services/session_service.dart';
@@ -8,40 +10,39 @@ class MovieSelectionScreen extends StatefulWidget {
   const MovieSelectionScreen({super.key});
 
   @override
-  _MovieSelectionScreenState createState() => _MovieSelectionScreenState();
+  MovieSelectionScreenState createState() => MovieSelectionScreenState();
 }
 
-class _MovieSelectionScreenState extends State<MovieSelectionScreen> {
+class MovieSelectionScreenState extends State<MovieSelectionScreen> {
   late Future<List<Movie>> _movies;
+  final SwiperController _swiperController = SwiperController();
   String errorMessage = '';
   bool isMatchFound = false;
-  String sessionId = ''; 
+  String sessionId = '';
 
   @override
   void initState() {
     super.initState();
-
-    _initializeSession(); 
-
-    _movies = MovieService().fetchMovies().catchError((error) {
-      setState(() {
-        errorMessage = error.toString();
-      });
-      return [];
-    });
+    _initializeSession();
+    _fetchMovies();
   }
 
   Future<void> _initializeSession() async {
     try {
-      if (sessionId.isEmpty) {
-        String deviceId =
-            await _getDeviceId();
-        Map<String, String> sessionData =
-            await SessionService().startSession(deviceId);
+      String? storedSessionId = await SessionService().getSessionId();
+      if (storedSessionId == null || storedSessionId.isEmpty) {
+        String deviceId = await _getDeviceId();
+        Session sessionData = await SessionService().startSession(deviceId);
+        await SessionService.saveSessionId(sessionData.sessionId);
         setState(() {
-          sessionId = sessionData['sessionId']!; 
+          sessionId = sessionData.sessionId;
         });
-        print('Session IDDDD: $sessionId');
+        print('Session ID: $sessionId');
+      } else {
+        setState(() {
+          sessionId = storedSessionId;
+        });
+        print('Retrieved Session ID: $sessionId');
       }
     } catch (error) {
       setState(() {
@@ -50,29 +51,44 @@ class _MovieSelectionScreenState extends State<MovieSelectionScreen> {
     }
   }
 
+  Future<void> _fetchMovies() async {
+    setState(() {
+      _movies = MovieService().fetchMovies().catchError((error) {
+        setState(() {
+          errorMessage = error.toString();
+        });
+        return [];
+      });
+    });
+  }
+
   Future<String> _getDeviceId() async {
-    return 'your-device-id'; 
+    final deviceId = await PlatformDeviceId.getDeviceId;
+    return deviceId ?? 'unknown_device_id';
   }
 
   Future<void> _handleSelection(Movie movie, bool vote) async {
-    if (sessionId.isEmpty) {
+    final String? currentSessionId = await SessionService().getSessionId();
+
+    if (currentSessionId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content:
-                Text('Session ID is invalid. Please start or join a session.')),
+          content:
+              Text('Session ID is invalid. Please start or join a session.'),
+        ),
       );
       return;
     }
 
     try {
-      final isMatch =
-          await SessionService().voteMovie(sessionId, movie.id, vote);
+      final bool isMatch =
+          await SessionService().voteMovie(currentSessionId, movie.id, vote);
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(vote
-              ? 'You liked ${movie.title}!'
-              : 'You skipped ${movie.title}.'),
+              ? 'You liked "${movie.title}"!'
+              : 'You skipped "${movie.title}".'),
           duration: const Duration(seconds: 2),
         ),
       );
@@ -83,6 +99,8 @@ class _MovieSelectionScreenState extends State<MovieSelectionScreen> {
         });
         _showMatchPopup(movie);
       }
+
+      _swiperController.next();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -99,12 +117,14 @@ class _MovieSelectionScreenState extends State<MovieSelectionScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: const Text('Match Found!'),
-          content: Text('Both users selected: ${movie.title}'),
+          content: Text('Both users selected: "${movie.title}"'),
           actions: <Widget>[
             TextButton(
               child: const Text('OK'),
               onPressed: () {
-                Navigator.of(context).pop();
+                Navigator.pop(context);
+                Navigator.pop(context);
+                Navigator.pop(context);
               },
             ),
           ],
@@ -113,10 +133,29 @@ class _MovieSelectionScreenState extends State<MovieSelectionScreen> {
     );
   }
 
+  Widget _buildLikeButton(Movie movie) {
+    return ElevatedButton(
+      onPressed: () => _handleSelection(movie, true),
+      child: const Text('Like'),
+    );
+  }
+
+  Widget _buildSkipButton(Movie movie) {
+    return ElevatedButton(
+      onPressed: () => _handleSelection(movie, false),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: Colors.grey,
+      ),
+      child: const Text('Skip'),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Movie Choices')),
+      appBar: AppBar(
+        title: const Text('Movie Choices'),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: errorMessage.isEmpty
@@ -136,6 +175,7 @@ class _MovieSelectionScreenState extends State<MovieSelectionScreen> {
                   }
 
                   return Swiper(
+                    controller: _swiperController, // Attach controller
                     itemCount: snapshot.data!.length,
                     itemBuilder: (context, index) {
                       final movie = snapshot.data![index];
@@ -154,7 +194,10 @@ class _MovieSelectionScreenState extends State<MovieSelectionScreen> {
                           const SizedBox(height: 20),
                           Text(
                             movie.title,
-                            style: Theme.of(context).textTheme.bodyLarge,
+                            style:
+                                Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                    ),
                             textAlign: TextAlign.center,
                           ),
                           const SizedBox(height: 10),
@@ -168,16 +211,20 @@ class _MovieSelectionScreenState extends State<MovieSelectionScreen> {
                               style: Theme.of(context).textTheme.bodyMedium,
                             ),
                           ),
+                          const SizedBox(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              _buildLikeButton(movie),
+                              const SizedBox(width: 20),
+                              _buildSkipButton(movie),
+                            ],
+                          ),
                         ],
                       );
                     },
                     pagination: const SwiperPagination(),
                     control: const SwiperControl(),
-                    onIndexChanged: (index) {},
-                    onTap: (index) {
-                      final movie = snapshot.data![index];
-                      _handleSelection(movie, true);
-                    },
                   );
                 },
               )

@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'screens/welcome_screen.dart';
-import 'screens/share_code_screen.dart';
-import 'screens/enter_code_screen.dart';
-import 'screens/movie_selection_screen.dart';
 import 'package:movie_night/widgets/colors.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+void main() async {
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   await Future.delayed(const Duration(seconds: 1));
   FlutterNativeSplash.remove();
@@ -25,7 +23,6 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       title: 'Movie Night',
       theme: ThemeData(
-        // primarySwatch: Colors.deepPurple,
         primaryColor: primaryColor,
         textTheme: GoogleFonts.latoTextTheme().copyWith(
           bodyMedium: const TextStyle(fontSize: 16, color: Colors.black),
@@ -57,13 +54,7 @@ class MainApp extends StatelessWidget {
         ),
         useMaterial3: true,
       ),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const WelcomeScreen(),
-        '/share-code': (context) => const ShareCodeScreen(),
-        '/enter-code': (context) => const EnterCodeScreen(),
-        '/movie-selection': (context) => const MovieSelectionScreen(),
-      },
+      home: const WelcomeScreen(),
     );
   }
 }

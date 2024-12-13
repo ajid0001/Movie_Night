@@ -21,13 +21,14 @@ dependencies:
   flutter_card_swiper: ^7.0.2
   swipe_cards: ^2.0.0+1
   flutter_swiper_view: ^1.1.8
+  flutter_launcher_icons: ^0.14.1
+  flutter_native_splash: ^2.4.3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints:
-  flutter_launcher_icons:
-  flutter_native_splash:
+  flutter_lints: ^4.0.0
+  
 
 flutter_icons:
   android: true
@@ -35,19 +36,13 @@ flutter_icons:
   image_path: "assets/images/icon.jpg"
 
 flutter_native_splash:
-  color: "#000000"
-  # background_color: "#000000"
-  # image: assets/images/splash.jpg
-  # background_image: assets/images/splash.jpg
-  android: true
-  ios: true
+  image: assets/images/splash.png
+  color: "000000"
 
 flutter:
   uses-material-design: true
   assets:
-    - assets/images/splash.jpg
+    - assets/images/splash.png
     - assets/images/icon.png
-    - assets/images/movie.jpg
     - assets/images/background.jpg
-    - assets/images/icon.jpg
     - .env
